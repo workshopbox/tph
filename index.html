@@ -1,1088 +1,161 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TPH Calculator Pro - DAP8 Analytics</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="32" height="32" rx="8" fill="url(#gradient)" />
-                        <path d="M16 8L24 12V20L16 24L8 20V12L16 8Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M16 8V24M8 12L24 20M24 12L8 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        <defs>
-                            <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
-                                <stop offset="0%" stop-color="#6366f1" />
-                                <stop offset="100%" stop-color="#8b5cf6" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div>
-                        <h1>TPH Calculator</h1>
-                        <p>DAP8 Analytics</p>
-                    </div>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" data-view="dashboard">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7" />
-                        <rect x="14" y="3" width="7" height="7" />
-                        <rect x="14" y="14" width="7" height="7" />
-                        <rect x="3" y="14" width="7" height="7" />
-                    </svg>
-                    Dashboard
-                </a>
-                <a href="#" class="nav-item" data-view="calculator">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="4" y="2" width="16" height="20" rx="2" />
-                        <line x1="8" y1="6" x2="16" y2="6" />
-                        <line x1="8" y1="10" x2="16" y2="10" />
-                        <line x1="8" y1="14" x2="16" y2="14" />
-                        <line x1="8" y1="18" x2="12" y2="18" />
-                    </svg>
-                    Calculator
-                </a>
-                <a href="#" class="nav-item" data-view="scenarios">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                        <line x1="12" y1="22.08" x2="12" y2="12" />
-                    </svg>
-                    Scenarios
-                </a>
-                <a href="#" class="nav-item" data-view="rates">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 6v6l4 2" />
-                    </svg>
-                    Rates Manager
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="user-avatar">K</div>
-                    <div class="user-info">
-                        <p class="user-name">Konsi</p>
-                        <p class="user-role">DAP8 Operations</p>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Header -->
-            <header class="header">
-                <div class="header-left">
-                    <h2 id="view-title">Dashboard</h2>
-                    <p id="view-subtitle">Real-time TPH analytics and forecasting</p>
-                </div>
-                <div class="header-right">
-                    <button class="btn btn-secondary" id="import-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="17 8 12 3 7 8" />
-                            <line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                        Import CSVs
-                    </button>
-                    <button class="btn btn-primary" id="export-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="7 10 12 15 17 10" />
-                            <line x1="12" y1="15" x2="12" y2="3" />
-                        </svg>
-                        Export Results
-                    </button>
-                </div>
-            </header>
-
-            <!-- Dashboard View -->
-            <div id="dashboard-view" class="view active">
-                <!-- KPI Cards -->
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                            </svg>
-                        </div>
-                        <div class="kpi-content">
-                            <p class="kpi-label">Current TPH</p>
-                            <h3 class="kpi-value" id="current-tph">10.5</h3>
-                            <p class="kpi-change negative">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="18 15 12 9 6 15" />
-                                </svg>
-                                2.3% vs last week
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                            </svg>
-                        </div>
-                        <div class="kpi-content">
-                            <p class="kpi-label">Optimized TPH</p>
-                            <h3 class="kpi-value" id="new-tph">11.8</h3>
-                            <p class="kpi-change positive">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="18 15 12 9 6 15" />
-                                </svg>
-                                +12.4% improvement
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                            </svg>
-                        </div>
-                        <div class="kpi-content">
-                            <p class="kpi-label">Weekly Volume</p>
-                            <h3 class="kpi-value" id="weekly-volume">169K</h3>
-                            <p class="kpi-change positive">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="18 15 12 9 6 15" />
-                                </svg>
-                                Week 49 • 2025
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                            </svg>
-                        </div>
-                        <div class="kpi-content">
-                            <p class="kpi-label">Hours Saved</p>
-                            <h3 class="kpi-value" id="hours-saved">127</h3>
-                            <p class="kpi-change positive">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="18 15 12 9 6 15" />
-                                </svg>
-                                €3,175 cost savings
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>TPH Trend Analysis</h3>
-                            <div class="chart-actions">
-                                <button class="btn-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="1" />
-                                        <circle cx="12" cy="5" r="1" />
-                                        <circle cx="12" cy="19" r="1" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="tph-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Activity Breakdown</h3>
-                            <div class="chart-actions">
-                                <button class="btn-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="1" />
-                                        <circle cx="12" cy="5" r="1" />
-                                        <circle cx="12" cy="19" r="1" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="activity-chart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Activity Table -->
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3>Top Activities by Hours</h3>
-                        <div class="table-filters">
-                            <input type="search" placeholder="Search activities..." class="search-input">
-                            <select class="filter-select">
-                                <option>All Cycles</option>
-                                <option>Cycle 1</option>
-                                <option>Cycle 4</option>
-                                <option>Tier 3</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table" id="dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th>Activity</th>
-                                    <th>Cycle</th>
-                                    <th>Current Hours</th>
-                                    <th>Optimized Hours</th>
-                                    <th>Savings</th>
-                                    <th>Impact</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dashboard-tbody">
-                                <!-- Data populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Calculator View -->
-            <div id="calculator-view" class="view">
-                <div class="calculator-container">
-                    <!-- Upload Section -->
-                    <div class="upload-section">
-                        <div class="upload-card" id="upload-alpx">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
-                            <h3>horizon_alpx.csv</h3>
-                            <p>Volume and hours data</p>
-                            <button class="btn btn-outline">Choose File</button>
-                            <input type="file" id="file-alpx" accept=".csv" style="display: none;">
-                        </div>
-
-                        <div class="upload-card" id="upload-table">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
-                            <h3>horizon_table.csv</h3>
-                            <p>Rates and configuration</p>
-                            <button class="btn btn-outline">Choose File</button>
-                            <input type="file" id="file-table" accept=".csv" style="display: none;">
-                        </div>
-                    </div>
-
-                    <!-- Data Table -->
-                    <div class="table-card" id="calculator-table-container" style="display: none;">
-                        <div class="table-header">
-                            <h3>Activity Schedule</h3>
-                            <div class="table-actions">
-                                <button class="btn btn-secondary" id="add-activity-btn">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="12" y1="5" x2="12" y2="19" />
-                                        <line x1="5" y1="12" x2="19" y2="12" />
-                                    </svg>
-                                    Add Activity
-                                </button>
-                                <button class="btn btn-primary" id="calculate-btn">Calculate TPH</button>
-                            </div>
-                        </div>
-                        <div class="table-scroll">
-                            <table class="data-table editable" id="calculator-data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Activity</th>
-                                        <th>Cycle</th>
-                                        <th>Sub-Activity</th>
-                                        <th>Rate</th>
-                                        <th class="date-col">Mon</th>
-                                        <th class="date-col">Tue</th>
-                                        <th class="date-col">Wed</th>
-                                        <th class="date-col">Thu</th>
-                                        <th class="date-col">Fri</th>
-                                        <th class="date-col">Sat</th>
-                                        <th class="date-col">Sun</th>
-                                        <th>Total Hours</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="calculator-tbody">
-                                    <!-- Data populated by JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Scenarios View -->
-            <div id="scenarios-view" class="view">
-                <div class="scenarios-grid">
-                    <div class="scenario-card new-scenario">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                        <h3>Create New Scenario</h3>
-                        <p>Start from scratch or copy existing</p>
-                    </div>
-
-                    <div class="scenario-card">
-                        <div class="scenario-header">
-                            <h3>Current Week - Baseline</h3>
-                            <span class="scenario-badge active">Active</span>
-                        </div>
-                        <div class="scenario-stats">
-                            <div class="stat">
-                                <p>TPH</p>
-                                <h4>10.5</h4>
-                            </div>
-                            <div class="stat">
-                                <p>Hours</p>
-                                <h4>16,095</h4>
-                            </div>
-                            <div class="stat">
-                                <p>Cost</p>
-                                <h4>€402K</h4>
-                            </div>
-                        </div>
-                        <div class="scenario-actions">
-                            <button class="btn btn-secondary">Edit</button>
-                            <button class="btn btn-primary">Load</button>
-                        </div>
-                    </div>
-
-                    <div class="scenario-card">
-                        <div class="scenario-header">
-                            <h3>Optimized Rates</h3>
-                            <span class="scenario-badge">Draft</span>
-                        </div>
-                        <div class="scenario-stats">
-                            <div class="stat">
-                                <p>TPH</p>
-                                <h4>11.8</h4>
-                            </div>
-                            <div class="stat">
-                                <p>Hours</p>
-                                <h4>14,322</h4>
-                            </div>
-                            <div class="stat">
-                                <p>Cost</p>
-                                <h4>€358K</h4>
-                            </div>
-                        </div>
-                        <div class="scenario-actions">
-                            <button class="btn btn-secondary">Edit</button>
-                            <button class="btn btn-primary">Load</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Comparison View -->
-                <div class="comparison-card">
-                    <div class="comparison-header">
-                        <h3>Scenario Comparison</h3>
-                        <div class="comparison-selects">
-                            <select class="filter-select">
-                                <option>Current Week - Baseline</option>
-                                <option>Optimized Rates</option>
-                            </select>
-                            <span>vs</span>
-                            <select class="filter-select">
-                                <option>Optimized Rates</option>
-                                <option>Current Week - Baseline</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="comparison-grid">
-                        <div class="comparison-metric">
-                            <p>TPH Improvement</p>
-                            <h3 class="positive">+12.4%</h3>
-                        </div>
-                        <div class="comparison-metric">
-                            <p>Hours Reduction</p>
-                            <h3 class="positive">-1,773</h3>
-                        </div>
-                        <div class="comparison-metric">
-                            <p>Cost Savings</p>
-                            <h3 class="positive">€44,325</h3>
-                        </div>
-                        <div class="comparison-metric">
-                            <p>Efficiency Gain</p>
-                            <h3 class="positive">+11.0%</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rates Manager View -->
-            <div id="rates-view" class="view">
-                <div class="rates-container">
-                    <div class="rates-sidebar">
-                        <h3>Rate Categories</h3>
-                        <div class="rates-menu">
-                            <a href="#" class="rates-menu-item active" data-category="picking">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="2" y="7" width="20" height="14" rx="2" />
-                                </svg>
-                                Picking & Staging
-                                <span class="rates-count">8</span>
-                            </a>
-                            <a href="#" class="rates-menu-item" data-category="sorting">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8" />
-                                </svg>
-                                Sorting & Diverting
-                                <span class="rates-count">6</span>
-                            </a>
-                            <a href="#" class="rates-menu-item" data-category="loading">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 3h15v13H1z" />
-                                    <path d="M16 8h5l3 3v5h-8V8z" />
-                                </svg>
-                                Loading & Dispatch
-                                <span class="rates-count">5</span>
-                            </a>
-                            <a href="#" class="rates-menu-item" data-category="support">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                    <circle cx="9" cy="7" r="4" />
-                                </svg>
-                                Support & Admin
-                                <span class="rates-count">4</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="rates-content">
-                        <div class="rates-header">
-                            <h3>Picking & Staging Rates</h3>
-                            <button class="btn btn-primary" id="add-rate-btn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="12" y1="5" x2="12" y2="19" />
-                                    <line x1="5" y1="12" x2="19" y2="12" />
-                                </svg>
-                                Add Rate
-                            </button>
-                        </div>
-
-                        <div class="rates-grid" id="rates-grid">
-                            <!-- Rate cards populated by JS -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Import Modal -->
-    <div class="modal" id="import-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Import CSV Files</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="upload-zones">
-                    <div class="upload-zone" id="drop-zone-alpx">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="17 8 12 3 7 8" />
-                            <line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                        <h4>horizon_alpx.csv</h4>
-                        <p>Drop file here or click to browse</p>
-                        <input type="file" id="modal-file-alpx" accept=".csv">
-                    </div>
-
-                    <div class="upload-zone" id="drop-zone-table">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="17 8 12 3 7 8" />
-                            <line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                        <h4>horizon_table.csv</h4>
-                        <p>Drop file here or click to browse</p>
-                        <input type="file" id="modal-file-table" accept=".csv">
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
-                <button class="btn btn-primary" id="modal-import">Import & Calculate</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Notifications -->
-    <div class="toast-container" id="toast-container"></div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="script.js"></script>
-</body>
-</html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TPH Calculator Pro - DAP8 Analytics</title>
+    <title>TPH Calculator - DAP8 Operations</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="32" height="32" rx="8" fill="url(#gradient)" />
-                        <path d="M16 8L24 12V20L16 24L8 20V12L16 8Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M16 8V24M8 12L24 20M24 12L8 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        <defs>
-                            <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
-                                <stop offset="0%" stop-color="#6366f1" />
-                                <stop offset="100%" stop-color="#8b5cf6" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div>
-                        <h1>TPH Calculator</h1>
-                        <p>DAP8 Analytics</p>
-                    </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <path d="M20 5L35 12.5V27.5L20 35L5 27.5V12.5L20 5Z" fill="#FF9900" stroke="#232F3E" stroke-width="2"/>
+                    <text x="20" y="26" text-anchor="middle" fill="#232F3E" font-family="Arial" font-weight="bold" font-size="16">D8</text>
+                </svg>
+                <div>
+                    <h1>TPH Calculator</h1>
+                    <span class="station-badge">DAP8 Steiermark</span>
                 </div>
             </div>
-
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" data-view="dashboard">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7" />
-                        <rect x="14" y="3" width="7" height="7" />
-                        <rect x="14" y="14" width="7" height="7" />
-                        <rect x="3" y="14" width="7" height="7" />
-                    </svg>
-                    Dashboard
-                </a>
-                <a href="#" class="nav-item" data-view="calculator">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="4" y="2" width="16" height="20" rx="2" />
-                        <line x1="8" y1="6" x2="16" y2="6" />
-                        <line x1="8" y1="10" x2="16" y2="10" />
-                        <line x1="8" y1="14" x2="16" y2="14" />
-                        <line x1="8" y1="18" x2="12" y2="18" />
-                    </svg>
-                    Calculator
-                </a>
-                <a href="#" class="nav-item" data-view="scenarios">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                        <line x1="12" y1="22.08" x2="12" y2="12" />
-                    </svg>
-                    Scenarios
-                </a>
-                <a href="#" class="nav-item" data-view="rates">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 6v6l4 2" />
-                    </svg>
-                    Rates Manager
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="user-avatar">K</div>
-                    <div class="user-info">
-                        <p class="user-name">Konsi</p>
-                        <p class="user-role">DAP8 Operations</p>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Header -->
-            <header class="header">
-                <div class="header-left">
-                    <h2 id="view-title">Dashboard</h2>
-                    <p id="view-subtitle">Real-time TPH analytics and forecasting</p>
-                </div>
-                <div class="header-right">
-                    <button class="btn btn-secondary" id="import-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="17 8 12 3 7 8" />
-                            <line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                        Import CSVs
-                    </button>
-                    <button class="btn btn-primary" id="export-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="7 10 12 15 17 10" />
-                            <line x1="12" y1="15" x2="12" y2="3" />
-                        </svg>
-                        Export Results
-                    </button>
-                </div>
-            </header>
-
-            <!-- Dashboard View -->
-            <div id="dashboard-view" class="view active">
-                <!-- KPI Cards -->
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                            </svg>
-                        </div>
-                        <div class="kpi-content">
-                            <p class="kpi-label">Current TPH</p>
-                            <h3 class="kpi-value" id="current-tph">10.5</h3>
-                            <p class="kpi-change negative">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="18 15 12 9 6 15" />
-                                </svg>
-                                2.3% vs last week
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                            </svg>
-                        </div>
-                        <div class="kpi-content">
-                            <p class="kpi-label">Optimized TPH</p>
-                            <h3 class="kpi-value" id="new-tph">11.8</h3>
-                            <p class="kpi-change positive">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="18 15 12 9 6 15" />
-                                </svg>
-                                +12.4% improvement
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                            </svg>
-                        </div>
-                        <div class="kpi-content">
-                            <p class="kpi-label">Weekly Volume</p>
-                            <h3 class="kpi-value" id="weekly-volume">169K</h3>
-                            <p class="kpi-change positive">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="18 15 12 9 6 15" />
-                                </svg>
-                                Week 49 • 2025
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                            </svg>
-                        </div>
-                        <div class="kpi-content">
-                            <p class="kpi-label">Hours Saved</p>
-                            <h3 class="kpi-value" id="hours-saved">127</h3>
-                            <p class="kpi-change positive">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="18 15 12 9 6 15" />
-                                </svg>
-                                €3,175 cost savings
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>TPH Trend Analysis</h3>
-                            <div class="chart-actions">
-                                <button class="btn-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="1" />
-                                        <circle cx="12" cy="5" r="1" />
-                                        <circle cx="12" cy="19" r="1" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="tph-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Activity Breakdown</h3>
-                            <div class="chart-actions">
-                                <button class="btn-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="1" />
-                                        <circle cx="12" cy="5" r="1" />
-                                        <circle cx="12" cy="19" r="1" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="activity-chart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Activity Table -->
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3>Top Activities by Hours</h3>
-                        <div class="table-filters">
-                            <input type="search" placeholder="Search activities..." class="search-input">
-                            <select class="filter-select">
-                                <option>All Cycles</option>
-                                <option>Cycle 1</option>
-                                <option>Cycle 4</option>
-                                <option>Tier 3</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="table-container">
-                        <table class="data-table" id="dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th>Activity</th>
-                                    <th>Cycle</th>
-                                    <th>Current Hours</th>
-                                    <th>Optimized Hours</th>
-                                    <th>Savings</th>
-                                    <th>Impact</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dashboard-tbody">
-                                <!-- Data populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Calculator View -->
-            <div id="calculator-view" class="view">
-                <div class="calculator-container">
-                    <!-- Upload Section -->
-                    <div class="upload-section">
-                        <div class="upload-card" id="upload-alpx">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
-                            <h3>horizon_alpx.csv</h3>
-                            <p>Volume and hours data</p>
-                            <button class="btn btn-outline">Choose File</button>
-                            <input type="file" id="file-alpx" accept=".csv" style="display: none;">
-                        </div>
-
-                        <div class="upload-card" id="upload-table">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
-                            <h3>horizon_table.csv</h3>
-                            <p>Rates and configuration</p>
-                            <button class="btn btn-outline">Choose File</button>
-                            <input type="file" id="file-table" accept=".csv" style="display: none;">
-                        </div>
-                    </div>
-
-                    <!-- Data Table -->
-                    <div class="table-card" id="calculator-table-container" style="display: none;">
-                        <div class="table-header">
-                            <h3>Activity Schedule</h3>
-                            <div class="table-actions">
-                                <button class="btn btn-secondary" id="add-activity-btn">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="12" y1="5" x2="12" y2="19" />
-                                        <line x1="5" y1="12" x2="19" y2="12" />
-                                    </svg>
-                                    Add Activity
-                                </button>
-                                <button class="btn btn-primary" id="calculate-btn">Calculate TPH</button>
-                            </div>
-                        </div>
-                        <div class="table-scroll">
-                            <table class="data-table editable" id="calculator-data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Activity</th>
-                                        <th>Cycle</th>
-                                        <th>Sub-Activity</th>
-                                        <th>Rate</th>
-                                        <th class="date-col">Mon</th>
-                                        <th class="date-col">Tue</th>
-                                        <th class="date-col">Wed</th>
-                                        <th class="date-col">Thu</th>
-                                        <th class="date-col">Fri</th>
-                                        <th class="date-col">Sat</th>
-                                        <th class="date-col">Sun</th>
-                                        <th>Total Hours</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="calculator-tbody">
-                                    <!-- Data populated by JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Scenarios View -->
-            <div id="scenarios-view" class="view">
-                <div class="scenarios-grid">
-                    <div class="scenario-card new-scenario">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                        <h3>Create New Scenario</h3>
-                        <p>Start from scratch or copy existing</p>
-                    </div>
-
-                    <div class="scenario-card">
-                        <div class="scenario-header">
-                            <h3>Current Week - Baseline</h3>
-                            <span class="scenario-badge active">Active</span>
-                        </div>
-                        <div class="scenario-stats">
-                            <div class="stat">
-                                <p>TPH</p>
-                                <h4>10.5</h4>
-                            </div>
-                            <div class="stat">
-                                <p>Hours</p>
-                                <h4>16,095</h4>
-                            </div>
-                            <div class="stat">
-                                <p>Cost</p>
-                                <h4>€402K</h4>
-                            </div>
-                        </div>
-                        <div class="scenario-actions">
-                            <button class="btn btn-secondary">Edit</button>
-                            <button class="btn btn-primary">Load</button>
-                        </div>
-                    </div>
-
-                    <div class="scenario-card">
-                        <div class="scenario-header">
-                            <h3>Optimized Rates</h3>
-                            <span class="scenario-badge">Draft</span>
-                        </div>
-                        <div class="scenario-stats">
-                            <div class="stat">
-                                <p>TPH</p>
-                                <h4>11.8</h4>
-                            </div>
-                            <div class="stat">
-                                <p>Hours</p>
-                                <h4>14,322</h4>
-                            </div>
-                            <div class="stat">
-                                <p>Cost</p>
-                                <h4>€358K</h4>
-                            </div>
-                        </div>
-                        <div class="scenario-actions">
-                            <button class="btn btn-secondary">Edit</button>
-                            <button class="btn btn-primary">Load</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Comparison View -->
-                <div class="comparison-card">
-                    <div class="comparison-header">
-                        <h3>Scenario Comparison</h3>
-                        <div class="comparison-selects">
-                            <select class="filter-select">
-                                <option>Current Week - Baseline</option>
-                                <option>Optimized Rates</option>
-                            </select>
-                            <span>vs</span>
-                            <select class="filter-select">
-                                <option>Optimized Rates</option>
-                                <option>Current Week - Baseline</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="comparison-grid">
-                        <div class="comparison-metric">
-                            <p>TPH Improvement</p>
-                            <h3 class="positive">+12.4%</h3>
-                        </div>
-                        <div class="comparison-metric">
-                            <p>Hours Reduction</p>
-                            <h3 class="positive">-1,773</h3>
-                        </div>
-                        <div class="comparison-metric">
-                            <p>Cost Savings</p>
-                            <h3 class="positive">€44,325</h3>
-                        </div>
-                        <div class="comparison-metric">
-                            <p>Efficiency Gain</p>
-                            <h3 class="positive">+11.0%</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Rates Manager View -->
-            <div id="rates-view" class="view">
-                <div class="rates-container">
-                    <div class="rates-sidebar">
-                        <h3>Rate Categories</h3>
-                        <div class="rates-menu">
-                            <a href="#" class="rates-menu-item active" data-category="picking">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="2" y="7" width="20" height="14" rx="2" />
-                                </svg>
-                                Picking & Staging
-                                <span class="rates-count">8</span>
-                            </a>
-                            <a href="#" class="rates-menu-item" data-category="sorting">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8" />
-                                </svg>
-                                Sorting & Diverting
-                                <span class="rates-count">6</span>
-                            </a>
-                            <a href="#" class="rates-menu-item" data-category="loading">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 3h15v13H1z" />
-                                    <path d="M16 8h5l3 3v5h-8V8z" />
-                                </svg>
-                                Loading & Dispatch
-                                <span class="rates-count">5</span>
-                            </a>
-                            <a href="#" class="rates-menu-item" data-category="support">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                    <circle cx="9" cy="7" r="4" />
-                                </svg>
-                                Support & Admin
-                                <span class="rates-count">4</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="rates-content">
-                        <div class="rates-header">
-                            <h3>Picking & Staging Rates</h3>
-                            <button class="btn btn-primary" id="add-rate-btn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="12" y1="5" x2="12" y2="19" />
-                                    <line x1="5" y1="12" x2="19" y2="12" />
-                                </svg>
-                                Add Rate
-                            </button>
-                        </div>
-
-                        <div class="rates-grid" id="rates-grid">
-                            <!-- Rate cards populated by JS -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Import Modal -->
-    <div class="modal" id="import-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Import CSV Files</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="upload-zones">
-                    <div class="upload-zone" id="drop-zone-alpx">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="17 8 12 3 7 8" />
-                            <line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                        <h4>horizon_alpx.csv</h4>
-                        <p>Drop file here or click to browse</p>
-                        <input type="file" id="modal-file-alpx" accept=".csv">
-                    </div>
-
-                    <div class="upload-zone" id="drop-zone-table">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="17 8 12 3 7 8" />
-                            <line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                        <h4>horizon_table.csv</h4>
-                        <p>Drop file here or click to browse</p>
-                        <input type="file" id="modal-file-table" accept=".csv">
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
-                <button class="btn btn-primary" id="modal-import">Import & Calculate</button>
+            <div class="header-actions">
+                <button class="btn-secondary" onclick="app.exportData()">Export Data</button>
+                <button class="btn-secondary" onclick="app.resetData()">Reset</button>
             </div>
         </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Upload Section -->
+        <section class="card upload-card" id="upload-section">
+            <div class="card-header">
+                <h2>📊 Import Horizon Data</h2>
+                <p>Upload your weekly forecast files to begin analysis</p>
+            </div>
+            <div class="card-body">
+                <div class="upload-grid">
+                    <div class="upload-area" id="box-alpx" onclick="document.getElementById('file-alpx').click()">
+                        <div class="upload-icon">📄</div>
+                        <h3>horizon_alpx.csv</h3>
+                        <p>Volume & operational hours data</p>
+                        <span class="upload-status" id="status-alpx">Click to upload</span>
+                    </div>
+                    <div class="upload-area" id="box-table" onclick="document.getElementById('file-table').click()">
+                        <div class="upload-icon">⚙️</div>
+                        <h3>horizon_table.csv</h3>
+                        <p>Rate configuration & parameters</p>
+                        <span class="upload-status" id="status-table">Click to upload</span>
+                    </div>
+                </div>
+                <input type="file" id="file-alpx" accept=".csv" style="display: none;">
+                <input type="file" id="file-table" accept=".csv" style="display: none;">
+                <div class="upload-actions">
+                    <button class="btn-primary" id="import-btn" disabled>
+                        <span>Process Data</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div class="loading-overlay" id="loading">
+            <div class="spinner"></div>
+            <p>Processing data...</p>
+        </div>
+
+        <!-- Volume Section -->
+        <section class="card" id="volume-section" style="display: none;">
+            <div class="card-header">
+                <h2>📦 Volume Configuration</h2>
+            </div>
+            <div class="card-body">
+                <div class="volume-control">
+                    <label>Weekly Package Volume</label>
+                    <div class="input-group">
+                        <input type="number" id="volume-input" value="169000" min="0" step="1000">
+                        <span class="input-suffix">packages</span>
+                        <button class="btn-secondary" onclick="app.recalculate()">
+                            <span>↻ Recalculate</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Cards -->
+        <section class="metrics-grid" id="metrics-section" style="display: none;">
+            <div class="metric-card">
+                <div class="metric-label">Current TPH</div>
+                <div class="metric-value" id="current-tph">--</div>
+                <div class="metric-change neutral">Baseline Performance</div>
+            </div>
+            <div class="metric-card highlight">
+                <div class="metric-label">Optimized TPH</div>
+                <div class="metric-value" id="new-tph">--</div>
+                <div class="metric-change" id="improvement-text">No changes</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Performance Delta</div>
+                <div class="metric-value" id="improvement">--</div>
+                <div class="metric-change neutral">Percentage Change</div>
+            </div>
+            <div class="metric-card highlight">
+                <div class="metric-label">Hours Saved</div>
+                <div class="metric-value" id="hours-saved">--</div>
+                <div class="metric-change" id="cost-saved">€0 weekly</div>
+            </div>
+        </section>
+
+        <!-- Calculator Table -->
+        <section class="card" id="calculator-section" style="display: none;">
+            <div class="card-header">
+                <h2>🔧 Activity Configuration</h2>
+                <p>Adjust rates and methods for each operational activity</p>
+            </div>
+            <div class="card-body">
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Sub-Activity</th>
+                                <th>Method</th>
+                                <th>Current Rate</th>
+                                <th>New Configuration</th>
+                                <th>Current Hours</th>
+                                <th>Optimized Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analysis Section -->
+        <section class="card analysis-card" id="analysis-section" style="display: none;">
+            <div class="card-header">
+                <h2>📈 Performance Analysis</h2>
+            </div>
+            <div class="card-body">
+                <div class="target-config">
+                    <label>Target TPH Threshold</label>
+                    <div class="input-group">
+                        <input type="number" id="target-input" value="11.5" step="0.1" min="0">
+                        <button class="btn-secondary" onclick="app.updateTarget()">Update Target</button>
+                    </div>
+                </div>
+                <div class="analysis-content" id="summary"></div>
+            </div>
+        </section>
+
     </div>
 
-    <!-- Toast Notifications -->
-    <div class="toast-container" id="toast-container"></div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
