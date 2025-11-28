@@ -406,8 +406,17 @@ class TPHCalculator {
     }
 
     calculate() {
+        // Calculate CURRENT hours based on current rates
+        this.data.activities.forEach(act => {
+            if (act.method === 'packages_hour' && act.currentRate > 0) {
+                act.currentHours = this.data.currentVolume / act.currentRate;
+            }
+            // For headcount and fixed, currentHours stays from Horizon
+        });
+        
         const totalCurrent = this.data.activities.reduce((s, a) => s + a.currentHours, 0);
         
+        // Calculate NEW hours based on modifications
         this.data.activities.forEach(act => {
             if (!act.isModified) {
                 act.newHours = act.currentHours;
