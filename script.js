@@ -1,4 +1,4 @@
-// Activity structure configuration
+// Activity Configuration
 const ACTIVITY_STRUCTURE = {
     'area_readiness': [
         { name: 'AMBASSADOR_HOURS', rate: null, method: 'headcount' },
@@ -44,15 +44,20 @@ const ACTIVITY_STRUCTURE = {
     ]
 };
 
-// Main TPH Calculator Class
 class TPHCalculator {
     constructor() {
         this.data = {
             alpx: null,
             table: null,
             activities: [],
-            volume: 169000,
-            target: 11.5
+            target: 11.5,
+            viewMode: 'weekly',
+            availableWeeks: [],
+            availableDates: [],
+            currentWeek: null,
+            currentDate: null,
+            currentVolume: 0,
+            currentColumn: null
         };
         this.init();
     }
@@ -95,71 +100,185 @@ class TPHCalculator {
         
         setTimeout(() => {
             try {
-                // Get needed_hours rows
-                const needed = this.data.alpx.filter(row => 
-                    row.metric_name === 'needed_hours' && 
-                    row.activity !== 'total' && 
-                    row.cycle !== 'total'
-                );
-
-                // Get volume from Horizon
-                const volumeRow = this.data.alpx.find(row => 
-                    row.metric_name === 'volume' && row.activity === 'total'
-                );
-                if (volumeRow) {
-                    const weeklyCols = Object.keys(volumeRow).filter(col => col.includes('weekly'));
-                    if (weeklyCols.length > 0) {
-                        this.data.volume = volumeRow[weeklyCols[0]] || 169000;
-                    }
-                }
-
-                // Calculate activity hours
-                const activityHours = {};
-                needed.forEach(row => {
-                    const cols = Object.keys(row).filter(col => col.includes('daily')).slice(0, 7);
-                    const total = cols.reduce((sum, col) => sum + (parseFloat(row[col]) || 0), 0);
-                    activityHours[row.activity] = (activityHours[row.activity] || 0) + total;
-                });
-
-                // Create activities with sub-activities
-                this.data.activities = [];
+                // Extract available weeks and dates
+                const columns = Object.keys(this.data.alpx[0]);
                 
-                Object.keys(ACTIVITY_STRUCTURE).forEach(mainActivity => {
-                    const totalHours = activityHours[mainActivity] || 0;
-                    const subs = ACTIVITY_STRUCTURE[mainActivity];
-                    const hoursPerSub = totalHours / subs.length;
-                    
-                    subs.forEach(sub => {
-                        this.data.activities.push({
-                            activity: mainActivity,
-                            subActivity: sub.name,
-                            method: sub.method,
-                            currentRate: sub.rate || 0,
-                            newRate: sub.rate || 0,
-                            currentHours: hoursPerSub,
-                            newHours: hoursPerSub,
-                            shifts: sub.method === 'headcount' ? [{ hc: 1, hours: 5.0 }] : [],
-                            isModified: false
-                        });
-                    });
+                // Get all weekly columns
+                const weeklyColumns = columns.filter(col => col.includes('weekly'));
+                this.data.availableWeeks = weeklyColumns.map(col => {
+                    const parts = col.split('_');
+                    return {
+                        week: parts[0],
+                        date: parts[2],
+                        column: col
+                    };
                 });
-
-                // Show sections
+                
+                // Get all daily columns grouped by week
+                const dailyColumns = columns.filter(col => col.includes('daily'));
+                const datesByWeek = {};
+                dailyColumns.forEach(col => {
+                    const parts = col.split('_');
+                    const week = parts[0];
+                    const date = parts[2];
+                    if (!datesByWeek[week]) datesByWeek[week] = [];
+                    datesByWeek[week].push({ date, column: col, week });
+                });
+                
+                // Flatten all dates
+                this.data.availableDates = [];
+                Object.values(datesByWeek).forEach(dates => {
+                    this.data.availableDates.push(...dates);
+                });
+                
+                // Populate selectors
+                this.populateSelectors();
+                
+                // Load first week by default
+                this.data.currentWeek = this.data.availableWeeks[0];
+                this.loadWeek();
+                
+                // Show interface
                 document.getElementById('loading').classList.remove('active');
-                document.getElementById('volume-input').value = this.data.volume;
+                document.getElementById('selector-section').style.display = 'block';
                 document.getElementById('volume-section').style.display = 'block';
                 document.getElementById('metrics-section').style.display = 'grid';
                 document.getElementById('calculator-section').style.display = 'block';
                 document.getElementById('analysis-section').style.display = 'block';
                 
-                this.render();
-                this.calculate();
             } catch (error) {
                 document.getElementById('loading').classList.remove('active');
-                alert('Error processing data: ' + error.message);
+                alert('Error processing: ' + error.message);
                 console.error(error);
             }
         }, 500);
+    }
+
+    populateSelectors() {
+        // Populate week selector
+        const weekSelect = document.getElementById('week-select');
+        weekSelect.innerHTML = '';
+        this.data.availableWeeks.forEach((week, i) => {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `Week ${week.week} (${this.formatDate(week.date)})`;
+            weekSelect.appendChild(option);
+        });
+        
+        // Populate date selector
+        const dateSelect = document.getElementById('date-select');
+        dateSelect.innerHTML = '';
+        this.data.availableDates.forEach((dateObj, i) => {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `${this.formatDate(dateObj.date)} (Week ${dateObj.week})`;
+            dateSelect.appendChild(option);
+        });
+    }
+
+    formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-GB', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric' 
+        });
+    }
+
+    changeViewMode(mode) {
+        this.data.viewMode = mode;
+        
+        if (mode === 'weekly') {
+            document.getElementById('weekly-selector').style.display = 'flex';
+            document.getElementById('daily-selector').style.display = 'none';
+            document.getElementById('volume-label').textContent = 'Weekly Volume';
+            document.getElementById('metric-label-current').textContent = 'Current Weekly TPH';
+            document.getElementById('metric-label-new').textContent = 'Optimized Weekly TPH';
+            this.loadWeek();
+        } else {
+            document.getElementById('weekly-selector').style.display = 'none';
+            document.getElementById('daily-selector').style.display = 'flex';
+            document.getElementById('volume-label').textContent = 'Daily Volume';
+            document.getElementById('metric-label-current').textContent = 'Current Daily TPH';
+            document.getElementById('metric-label-new').textContent = 'Optimized Daily TPH';
+            this.loadDate();
+        }
+    }
+
+    loadWeek() {
+        const weekIndex = parseInt(document.getElementById('week-select').value);
+        this.data.currentWeek = this.data.availableWeeks[weekIndex];
+        this.data.currentColumn = this.data.currentWeek.column;
+        
+        // Update info display
+        document.getElementById('week-info').textContent = 
+            `Week ${this.data.currentWeek.week} starting ${this.formatDate(this.data.currentWeek.date)}`;
+        
+        this.loadData();
+    }
+
+    loadDate() {
+        const dateIndex = parseInt(document.getElementById('date-select').value);
+        this.data.currentDate = this.data.availableDates[dateIndex];
+        this.data.currentColumn = this.data.currentDate.column;
+        
+        // Update info display
+        document.getElementById('date-info').textContent = 
+            `${this.formatDate(this.data.currentDate.date)} (Week ${this.data.currentDate.week})`;
+        
+        this.loadData();
+    }
+
+    loadData() {
+        // Get volume for current period
+        const volumeRow = this.data.alpx.find(row => 
+            row.metric_name === 'volume' && row.activity === 'total'
+        );
+        
+        if (volumeRow) {
+            this.data.currentVolume = volumeRow[this.data.currentColumn] || 0;
+            document.getElementById('volume-input').value = this.data.currentVolume;
+        }
+        
+        // Get needed_hours data
+        const needed = this.data.alpx.filter(row => 
+            row.metric_name === 'needed_hours' && 
+            row.activity !== 'total' && 
+            row.cycle !== 'total'
+        );
+        
+        // Calculate hours per activity
+        const activityHours = {};
+        needed.forEach(row => {
+            const hours = row[this.data.currentColumn] || 0;
+            activityHours[row.activity] = (activityHours[row.activity] || 0) + hours;
+        });
+        
+        // Build activities with sub-activities
+        this.data.activities = [];
+        
+        Object.keys(ACTIVITY_STRUCTURE).forEach(mainActivity => {
+            const totalHours = activityHours[mainActivity] || 0;
+            const subs = ACTIVITY_STRUCTURE[mainActivity];
+            const hoursPerSub = totalHours / subs.length;
+            
+            subs.forEach(sub => {
+                this.data.activities.push({
+                    activity: mainActivity,
+                    subActivity: sub.name,
+                    method: sub.method,
+                    currentRate: sub.rate || 0,
+                    newRate: sub.rate || 0,
+                    currentHours: hoursPerSub,
+                    newHours: hoursPerSub,
+                    shifts: sub.method === 'headcount' ? [{ hc: 1, hours: 5.0 }] : [],
+                    isModified: false
+                });
+            });
+        });
+        
+        this.render();
+        this.calculate();
     }
 
     render() {
@@ -168,9 +287,7 @@ class TPHCalculator {
         
         this.data.activities.forEach((act, i) => {
             const row = document.createElement('tr');
-            if (act.subActivity.includes('AMBASSADOR')) {
-                row.classList.add('ambassador-row');
-            }
+            if (act.subActivity.includes('AMBASSADOR')) row.classList.add('ambassador-row');
             
             let configHTML = '';
             if (act.method === 'headcount') {
@@ -190,7 +307,7 @@ class TPHCalculator {
                         </div>
                     `;
                 });
-                configHTML += `<button class="btn-secondary btn-small" onclick="app.addShift(${i})">+ Add Shift</button></div>`;
+                configHTML += `<button class="btn-secondary btn-small" onclick="app.addShift(${i})">+ Add</button></div>`;
             } else {
                 configHTML = `<input type="number" class="rate-input" value="${act.newRate}" onchange="app.updateRate(${i}, this.value)" min="0">`;
             }
@@ -232,14 +349,25 @@ class TPHCalculator {
     }
 
     updateShiftHC(i, si, val) {
-        this.data.activities[i].shifts[si].hc = parseFloat(val) || 0;
-        this.data.activities[i].isModified = true;
+        const newHC = parseFloat(val) || 0;
+        this.data.activities[i].shifts[si].hc = newHC;
+        
+        const isOriginal = this.data.activities[i].shifts.length === 1 && 
+                          this.data.activities[i].shifts[0].hc === 1 && 
+                          this.data.activities[i].shifts[0].hours === 5.0;
+        
+        this.data.activities[i].isModified = !isOriginal;
         this.calculate();
     }
 
     updateShiftHours(i, si, val) {
         this.data.activities[i].shifts[si].hours = parseFloat(val);
-        this.data.activities[i].isModified = true;
+        
+        const isOriginal = this.data.activities[i].shifts.length === 1 && 
+                          this.data.activities[i].shifts[0].hc === 1 && 
+                          this.data.activities[i].shifts[0].hours === 5.0;
+        
+        this.data.activities[i].isModified = !isOriginal;
         this.calculate();
     }
 
@@ -268,7 +396,7 @@ class TPHCalculator {
     }
 
     recalculate() {
-        this.data.volume = parseFloat(document.getElementById('volume-input').value) || 169000;
+        this.data.currentVolume = parseFloat(document.getElementById('volume-input').value) || 0;
         this.calculate();
     }
 
@@ -280,13 +408,12 @@ class TPHCalculator {
     calculate() {
         const totalCurrent = this.data.activities.reduce((s, a) => s + a.currentHours, 0);
         
-        // Calculate new hours
         this.data.activities.forEach(act => {
             if (!act.isModified) {
                 act.newHours = act.currentHours;
             } else {
                 if (act.method === 'packages_hour' && act.newRate > 0) {
-                    act.newHours = this.data.volume / act.newRate;
+                    act.newHours = this.data.currentVolume / act.newRate;
                 } else if (act.method === 'headcount') {
                     act.newHours = act.shifts.reduce((sum, s) => sum + (s.hc * s.hours), 0);
                 } else {
@@ -297,35 +424,33 @@ class TPHCalculator {
         
         const totalNew = this.data.activities.reduce((s, a) => s + a.newHours, 0);
         
-        const currentTPH = this.data.volume / totalCurrent;
-        const newTPH = this.data.volume / totalNew;
+        const currentTPH = this.data.currentVolume / totalCurrent;
+        const newTPH = this.data.currentVolume / totalNew;
         const improvement = ((newTPH - currentTPH) / currentTPH) * 100;
         const saved = totalCurrent - totalNew;
         
-        // Update metrics
         document.getElementById('current-tph').textContent = currentTPH.toFixed(2);
         document.getElementById('new-tph').textContent = newTPH.toFixed(2);
         document.getElementById('improvement').textContent = (improvement > 0 ? '+' : '') + improvement.toFixed(1) + '%';
         document.getElementById('hours-saved').textContent = Math.round(saved);
         
-        // Update metric styling
         const improvementText = document.getElementById('improvement-text');
         const costSaved = document.getElementById('cost-saved');
         
         if (improvement > 0) {
             improvementText.textContent = `+${improvement.toFixed(1)}% improvement`;
             improvementText.className = 'metric-change positive';
-            costSaved.textContent = `€${Math.round(saved * 25).toLocaleString()} weekly`;
+            costSaved.textContent = `€${Math.round(saved * 25).toLocaleString()}`;
             costSaved.className = 'metric-change positive';
         } else if (improvement < 0) {
             improvementText.textContent = `${improvement.toFixed(1)}% decrease`;
             improvementText.className = 'metric-change negative';
-            costSaved.textContent = `€${Math.round(Math.abs(saved) * 25).toLocaleString()} increase`;
+            costSaved.textContent = `€${Math.round(Math.abs(saved) * 25).toLocaleString()} loss`;
             costSaved.className = 'metric-change negative';
         } else {
-            improvementText.textContent = 'No changes applied';
+            improvementText.textContent = 'No changes';
             improvementText.className = 'metric-change neutral';
-            costSaved.textContent = '€0 weekly';
+            costSaved.textContent = '€0';
             costSaved.className = 'metric-change neutral';
         }
         
@@ -336,57 +461,27 @@ class TPHCalculator {
         const target = this.data.target;
         const gap = target - currentTPH;
         const saved = totalCurrent - totalNew;
+        const periodType = this.data.viewMode === 'weekly' ? 'Weekly' : 'Daily';
         
         let html = '<div style="margin-bottom: 1.5rem;">';
-        html += '<h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-primary);">Current State Analysis</h3>';
-        html += `<p><strong>Weekly Package Volume:</strong> ${this.data.volume.toLocaleString()} packages</p>`;
-        html += `<p><strong>Total Labor Hours:</strong> ${totalCurrent.toFixed(0)} hours</p>`;
-        html += `<p><strong>Current TPH:</strong> ${currentTPH.toFixed(2)} (calculated as ${this.data.volume.toLocaleString()} ÷ ${totalCurrent.toFixed(0)})</p>`;
+        html += `<h3 style="font-size: 1rem; margin-bottom: 1rem;">${periodType} Performance</h3>`;
+        html += `<p><strong>Volume:</strong> ${this.data.currentVolume.toLocaleString()} packages</p>`;
+        html += `<p><strong>Labor Hours:</strong> ${totalCurrent.toFixed(0)} hours</p>`;
+        html += `<p><strong>Current TPH:</strong> ${currentTPH.toFixed(2)}</p>`;
         html += '</div>';
         
         if (currentTPH >= target) {
-            html += `<div class="status-badge success" style="margin-bottom: 1rem;">✓ MEETING TARGET PERFORMANCE</div>`;
-            html += `<p>Your current TPH of <strong>${currentTPH.toFixed(2)}</strong> exceeds the target of <strong>${target}</strong> by ${((currentTPH - target) / target * 100).toFixed(1)}%. Operations are performing efficiently.</p>`;
+            html += `<div class="status-badge success">✓ ABOVE TARGET (${((currentTPH - target) / target * 100).toFixed(1)}%)</div>`;
         } else {
-            html += `<div class="status-badge warning" style="margin-bottom: 1rem;">⚠ BELOW TARGET THRESHOLD</div>`;
-            html += `<p>Current TPH of <strong>${currentTPH.toFixed(2)}</strong> is <strong>${gap.toFixed(2)} TPH</strong> below target (${(Math.abs(gap) / target * 100).toFixed(1)}% gap).</p>`;
-            
-            const targetHours = this.data.volume / target;
-            const hoursToSave = totalCurrent - targetHours;
-            
-            html += '<div style="margin-top: 1.5rem;"><h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-primary);">Recommended Optimization Strategy</h3>';
-            html += `<p>To achieve target TPH of <strong>${target}</strong>, reduce total hours by <strong>${hoursToSave.toFixed(0)} hours/week</strong>.</p>`;
-            html += '<p><strong>Realistic Performance Improvements:</strong></p><ul>';
-            
-            const bigActivities = this.data.activities
-                .filter(a => a.method === 'packages_hour' && a.currentRate > 0 && a.currentHours > 50)
-                .sort((a, b) => b.currentHours - a.currentHours)
-                .slice(0, 3);
-            
-            let totalPotential = 0;
-            bigActivities.forEach(act => {
-                const improved = Math.round(act.currentRate * 1.10);
-                const hoursSaved = act.currentHours - (this.data.volume / improved);
-                totalPotential += hoursSaved;
-                html += `<li><strong>${act.subActivity}:</strong> Increase rate from ${act.currentRate} to ${improved} pkg/hr (+10% efficiency) → Reduces ${hoursSaved.toFixed(0)} hours weekly</li>`;
-            });
-            html += '</ul>';
-            
-            if (totalPotential >= hoursToSave) {
-                html += `<div class="status-badge success" style="margin-top: 1rem;">Combined potential savings: ${totalPotential.toFixed(0)} hours — Target achievable</div>`;
-            } else {
-                html += `<div class="status-badge warning" style="margin-top: 1rem;">Combined potential: ${totalPotential.toFixed(0)} hours — Additional ${(hoursToSave - totalPotential).toFixed(0)} hours needed</div>`;
-            }
-            html += '</div>';
+            html += `<div class="status-badge warning">⚠ BELOW TARGET (${(Math.abs(gap) / target * 100).toFixed(1)}%)</div>`;
         }
         
-        if (Math.abs(saved) > 5) {
+        if (Math.abs(saved) > 1) {
             html += '<div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--amazon-border);">';
-            html += '<h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-primary);">Applied Optimization Impact</h3>';
-            html += `<p><strong>Optimized Total Hours:</strong> ${totalNew.toFixed(0)} hours</p>`;
-            html += `<p><strong>Optimized TPH:</strong> ${newTPH.toFixed(2)}</p>`;
-            html += `<p><strong>Hours Saved:</strong> ${Math.round(saved)} hours/week</p>`;
-            html += `<p><strong>Cost Impact:</strong> €${Math.round(Math.abs(saved) * 25).toLocaleString()} weekly (based on €25/hour labor cost)</p>`;
+            html += '<h3 style="font-size: 1rem; margin-bottom: 1rem;">Optimization Impact</h3>';
+            html += `<p><strong>New Hours:</strong> ${totalNew.toFixed(0)}</p>`;
+            html += `<p><strong>New TPH:</strong> ${newTPH.toFixed(2)}</p>`;
+            html += `<p><strong>Savings:</strong> ${Math.round(saved)} hours (€${Math.round(Math.abs(saved) * 25).toLocaleString()})</p>`;
             html += '</div>';
         }
         
@@ -395,7 +490,9 @@ class TPHCalculator {
 
     exportData() {
         const data = {
-            volume: this.data.volume,
+            mode: this.data.viewMode,
+            period: this.data.viewMode === 'weekly' ? this.data.currentWeek : this.data.currentDate,
+            volume: this.data.currentVolume,
             target: this.data.target,
             activities: this.data.activities,
             timestamp: new Date().toISOString()
@@ -405,16 +502,15 @@ class TPHCalculator {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `tph-calculation-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `tph-${this.data.viewMode}-${new Date().toISOString().split('T')[0]}.json`;
         a.click();
     }
 
     resetData() {
-        if (confirm('Reset all data? This will clear all calculations.')) {
+        if (confirm('Reset all changes?')) {
             location.reload();
         }
     }
 }
 
-// Initialize app
 const app = new TPHCalculator();

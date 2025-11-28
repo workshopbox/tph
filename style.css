@@ -1,4 +1,4 @@
-/* Amazon Corporate Design System */
+/* Amazon Design System */
 :root {
     --amazon-orange: #FF9900;
     --amazon-dark: #232F3E;
@@ -17,15 +17,11 @@
     --shadow-lg: 0 8px 16px rgba(0,0,0,0.16);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Amazon Ember', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: var(--amazon-gray);
+    font-family: 'Amazon Ember', Arial, sans-serif;
+    background: var(--amazon-gray);
     color: var(--text-primary);
     line-height: 1.6;
 }
@@ -60,7 +56,6 @@ body {
     font-size: 1.5rem;
     font-weight: 700;
     margin: 0;
-    color: white;
 }
 
 .station-badge {
@@ -71,7 +66,6 @@ body {
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
 }
 
 .header-actions {
@@ -103,7 +97,6 @@ body {
 .card-header h2 {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--text-primary);
     margin-bottom: 0.25rem;
 }
 
@@ -113,9 +106,7 @@ body {
     margin: 0;
 }
 
-.card-body {
-    padding: 1.5rem;
-}
+.card-body { padding: 1.5rem; }
 
 /* Upload Section */
 .upload-grid {
@@ -131,7 +122,7 @@ body {
     padding: 2rem;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
     background: var(--bg-white);
 }
 
@@ -146,15 +137,11 @@ body {
     border-style: solid;
 }
 
-.upload-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
+.upload-icon { font-size: 3rem; margin-bottom: 1rem; }
 
 .upload-area h3 {
     font-size: 1rem;
     font-weight: 700;
-    color: var(--text-primary);
     margin-bottom: 0.5rem;
 }
 
@@ -178,9 +165,7 @@ body {
     color: white;
 }
 
-.upload-actions {
-    text-align: center;
-}
+.upload-actions { text-align: center; }
 
 /* Buttons */
 .btn-primary, .btn-secondary {
@@ -190,7 +175,7 @@ body {
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -211,7 +196,6 @@ body {
     background: #DDD;
     color: #999;
     cursor: not-allowed;
-    box-shadow: none;
 }
 
 .btn-secondary {
@@ -228,7 +212,6 @@ body {
 .btn-small {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
-    border-radius: 3px;
 }
 
 /* Loading */
@@ -239,7 +222,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0,0,0,0.5);
     z-index: 9999;
     align-items: center;
     justify-content: center;
@@ -247,22 +230,18 @@ body {
     gap: 1rem;
 }
 
-.loading-overlay.active {
-    display: flex;
-}
+.loading-overlay.active { display: flex; }
 
 .spinner {
     width: 50px;
     height: 50px;
-    border: 4px solid rgba(255, 255, 255, 0.3);
+    border: 4px solid rgba(255,255,255,0.3);
     border-top-color: var(--amazon-orange);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .loading-overlay p {
     color: white;
@@ -270,17 +249,73 @@ body {
     font-weight: 600;
 }
 
-/* Volume Control */
-.volume-control {
-    max-width: 600px;
+/* Selector Controls */
+.selector-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.volume-control label {
-    display: block;
+.view-mode-selector {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.radio-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.radio-btn input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.period-selector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.period-selector label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
+}
+
+.period-selector select {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--amazon-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    min-width: 250px;
+    background: white;
+    cursor: pointer;
+}
+
+.period-selector select:focus {
+    outline: none;
+    border-color: var(--amazon-blue);
+    box-shadow: 0 0 0 3px rgba(20,110,180,0.1);
+}
+
+.period-selector span {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    padding: 0.5rem 1rem;
+    background: var(--amazon-gray);
+    border-radius: 4px;
+}
+
+/* Volume Control */
+.volume-control {
+    max-width: 100%;
 }
 
 .input-group {
@@ -296,13 +331,12 @@ body {
     border-radius: 4px;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--text-primary);
 }
 
 .input-group input:focus {
     outline: none;
     border-color: var(--amazon-blue);
-    box-shadow: 0 0 0 3px rgba(20, 110, 180, 0.1);
+    box-shadow: 0 0 0 3px rgba(20,110,180,0.1);
 }
 
 .input-suffix {
@@ -310,7 +344,7 @@ body {
     color: var(--text-secondary);
 }
 
-/* Metrics Grid */
+/* Metrics */
 .metrics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -343,7 +377,6 @@ body {
 .metric-value {
     font-size: 2.5rem;
     font-weight: 700;
-    color: var(--text-primary);
     margin-bottom: 0.5rem;
 }
 
@@ -352,17 +385,9 @@ body {
     font-weight: 600;
 }
 
-.metric-change.positive {
-    color: var(--success-green);
-}
-
-.metric-change.negative {
-    color: var(--error-red);
-}
-
-.metric-change.neutral {
-    color: var(--text-secondary);
-}
+.metric-change.positive { color: var(--success-green); }
+.metric-change.negative { color: var(--error-red); }
+.metric-change.neutral { color: var(--text-secondary); }
 
 /* Table */
 .table-wrapper {
@@ -389,7 +414,6 @@ body {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    white-space: nowrap;
 }
 
 .data-table td {
@@ -397,17 +421,10 @@ body {
     border-bottom: 1px solid var(--amazon-border);
 }
 
-.data-table tbody tr:hover {
-    background: #FAFAFA;
-}
+.data-table tbody tr:hover { background: #FAFAFA; }
 
-.data-table tbody tr.ambassador-row {
-    background: #FFF9E6;
-}
-
-.data-table tbody tr.ambassador-row:hover {
-    background: #FFF5D6;
-}
+.data-table tbody tr.ambassador-row { background: #FFF9E6; }
+.data-table tbody tr.ambassador-row:hover { background: #FFF5D6; }
 
 .data-table input[type="number"],
 .data-table select {
@@ -415,7 +432,6 @@ body {
     border: 1px solid var(--amazon-border);
     border-radius: 4px;
     font-size: 0.875rem;
-    background: white;
 }
 
 .data-table input[type="number"]:focus,
@@ -424,9 +440,7 @@ body {
     border-color: var(--amazon-blue);
 }
 
-.rate-input {
-    width: 100px;
-}
+.rate-input { width: 100px; }
 
 /* Shift Management */
 .shift-group {
@@ -459,7 +473,7 @@ body {
     border-radius: 3px;
 }
 
-/* Analysis Section */
+/* Analysis */
 .target-config {
     background: var(--amazon-gray);
     padding: 1.5rem;
@@ -471,7 +485,6 @@ body {
     display: block;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-primary);
     margin-bottom: 0.5rem;
 }
 
@@ -481,11 +494,9 @@ body {
 
 .analysis-content p {
     margin-bottom: 1rem;
-    color: var(--text-primary);
 }
 
 .analysis-content strong {
-    color: var(--text-primary);
     font-weight: 700;
 }
 
@@ -504,7 +515,6 @@ body {
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
 }
 
 .status-badge.success {
@@ -517,32 +527,10 @@ body {
     color: #856404;
 }
 
-.status-badge.error {
-    background: #F8D7DA;
-    color: #721C24;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
-    .container {
-        padding: 0 1rem;
-    }
-    
-    .header-content {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-    
-    .metrics-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .upload-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .table-wrapper {
-        overflow-x: scroll;
-    }
+    .container { padding: 0 1rem; }
+    .header-content { flex-direction: column; gap: 1rem; }
+    .metrics-grid { grid-template-columns: 1fr; }
+    .upload-grid { grid-template-columns: 1fr; }
 }

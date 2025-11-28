@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TPH Calculator - DAP8 Operations</title>
+    <title>TPH Calculator V2 - DAP8</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
@@ -17,12 +17,12 @@
                     <text x="20" y="26" text-anchor="middle" fill="#232F3E" font-family="Arial" font-weight="bold" font-size="16">D8</text>
                 </svg>
                 <div>
-                    <h1>TPH Calculator</h1>
+                    <h1>TPH Calculator V2.0</h1>
                     <span class="station-badge">DAP8 Steiermark</span>
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn-secondary" onclick="app.exportData()">Export Data</button>
+                <button class="btn-secondary" onclick="app.exportData()">Export</button>
                 <button class="btn-secondary" onclick="app.resetData()">Reset</button>
             </div>
         </div>
@@ -35,20 +35,20 @@
         <section class="card upload-card" id="upload-section">
             <div class="card-header">
                 <h2>📊 Import Horizon Data</h2>
-                <p>Upload your weekly forecast files to begin analysis</p>
+                <p>Upload weekly forecast files to begin</p>
             </div>
             <div class="card-body">
                 <div class="upload-grid">
                     <div class="upload-area" id="box-alpx" onclick="document.getElementById('file-alpx').click()">
                         <div class="upload-icon">📄</div>
                         <h3>horizon_alpx.csv</h3>
-                        <p>Volume & operational hours data</p>
+                        <p>Volume & hours data</p>
                         <span class="upload-status" id="status-alpx">Click to upload</span>
                     </div>
                     <div class="upload-area" id="box-table" onclick="document.getElementById('file-table').click()">
                         <div class="upload-icon">⚙️</div>
                         <h3>horizon_table.csv</h3>
-                        <p>Rate configuration & parameters</p>
+                        <p>Rate configuration</p>
                         <span class="upload-status" id="status-table">Click to upload</span>
                     </div>
                 </div>
@@ -62,22 +62,55 @@
             </div>
         </section>
 
-        <!-- Loading Indicator -->
+        <!-- Loading -->
         <div class="loading-overlay" id="loading">
             <div class="spinner"></div>
             <p>Processing data...</p>
         </div>
 
+        <!-- Date Selector Section -->
+        <section class="card" id="selector-section" style="display: none;">
+            <div class="card-header">
+                <h2>📅 Select View Period</h2>
+            </div>
+            <div class="card-body">
+                <div class="selector-controls">
+                    <div class="view-mode-selector">
+                        <label class="radio-btn">
+                            <input type="radio" name="view-mode" value="weekly" checked onchange="app.changeViewMode('weekly')">
+                            <span>Weekly View</span>
+                        </label>
+                        <label class="radio-btn">
+                            <input type="radio" name="view-mode" value="daily" onchange="app.changeViewMode('daily')">
+                            <span>Daily View</span>
+                        </label>
+                    </div>
+                    
+                    <div class="period-selector" id="weekly-selector">
+                        <label>Select Week:</label>
+                        <select id="week-select" onchange="app.loadWeek()"></select>
+                        <span id="week-info"></span>
+                    </div>
+                    
+                    <div class="period-selector" id="daily-selector" style="display: none;">
+                        <label>Select Date:</label>
+                        <select id="date-select" onchange="app.loadDate()"></select>
+                        <span id="date-info"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Volume Section -->
         <section class="card" id="volume-section" style="display: none;">
             <div class="card-header">
                 <h2>📦 Volume Configuration</h2>
+                <p id="volume-label">Current Period Volume</p>
             </div>
             <div class="card-body">
                 <div class="volume-control">
-                    <label>Weekly Package Volume</label>
                     <div class="input-group">
-                        <input type="number" id="volume-input" value="169000" min="0" step="1000">
+                        <input type="number" id="volume-input" value="0" min="0" step="1000">
                         <span class="input-suffix">packages</span>
                         <button class="btn-secondary" onclick="app.recalculate()">
                             <span>↻ Recalculate</span>
@@ -90,24 +123,24 @@
         <!-- Results Cards -->
         <section class="metrics-grid" id="metrics-section" style="display: none;">
             <div class="metric-card">
-                <div class="metric-label">Current TPH</div>
+                <div class="metric-label" id="metric-label-current">Current TPH</div>
                 <div class="metric-value" id="current-tph">--</div>
-                <div class="metric-change neutral">Baseline Performance</div>
+                <div class="metric-change neutral">Baseline</div>
             </div>
             <div class="metric-card highlight">
-                <div class="metric-label">Optimized TPH</div>
+                <div class="metric-label" id="metric-label-new">Optimized TPH</div>
                 <div class="metric-value" id="new-tph">--</div>
                 <div class="metric-change" id="improvement-text">No changes</div>
             </div>
             <div class="metric-card">
-                <div class="metric-label">Performance Delta</div>
+                <div class="metric-label">Delta</div>
                 <div class="metric-value" id="improvement">--</div>
-                <div class="metric-change neutral">Percentage Change</div>
+                <div class="metric-change neutral">Change</div>
             </div>
             <div class="metric-card highlight">
                 <div class="metric-label">Hours Saved</div>
                 <div class="metric-value" id="hours-saved">--</div>
-                <div class="metric-change" id="cost-saved">€0 weekly</div>
+                <div class="metric-change" id="cost-saved">€0</div>
             </div>
         </section>
 
@@ -115,7 +148,7 @@
         <section class="card" id="calculator-section" style="display: none;">
             <div class="card-header">
                 <h2>🔧 Activity Configuration</h2>
-                <p>Adjust rates and methods for each operational activity</p>
+                <p>Adjust rates for selected period</p>
             </div>
             <div class="card-body">
                 <div class="table-wrapper">
@@ -126,9 +159,9 @@
                                 <th>Sub-Activity</th>
                                 <th>Method</th>
                                 <th>Current Rate</th>
-                                <th>New Configuration</th>
+                                <th>New Config</th>
                                 <th>Current Hours</th>
-                                <th>Optimized Hours</th>
+                                <th>New Hours</th>
                             </tr>
                         </thead>
                         <tbody id="tbody"></tbody>
@@ -138,7 +171,7 @@
         </section>
 
         <!-- Analysis Section -->
-        <section class="card analysis-card" id="analysis-section" style="display: none;">
+        <section class="card" id="analysis-section" style="display: none;">
             <div class="card-header">
                 <h2>📈 Performance Analysis</h2>
             </div>
@@ -147,7 +180,7 @@
                     <label>Target TPH Threshold</label>
                     <div class="input-group">
                         <input type="number" id="target-input" value="11.5" step="0.1" min="0">
-                        <button class="btn-secondary" onclick="app.updateTarget()">Update Target</button>
+                        <button class="btn-secondary" onclick="app.updateTarget()">Update</button>
                     </div>
                 </div>
                 <div class="analysis-content" id="summary"></div>
